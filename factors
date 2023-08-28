@@ -1,15 +1,36 @@
 #!/usr/bin/python3
 
 import sys
-from gmpy2 import mpz, is_prime
+import random
+
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+def pollard_rho(n, max_steps=100000):
+    x = random.randint(1, n - 1)
+    y = x
+    d = 1
+    count = 0
+    
+    while d == 1 and count < max_steps:
+        x = (x * x + 1) % n
+        y = (y * y + 1) % n
+        y = (y * y + 1) % n
+        d = gcd(abs(x - y), n)
+        count += 1
+    
+    return d
 
 def factorize(n):
     factors = []
     
     while n > 1:
-        d = 2
-        while d <= n and not n % d == 0:
-            d += 1
+        d = pollard_rho(n)
+        if d == n:
+            factors.append(d)
+            break
         factors.append(d)
         n //= d
         
@@ -24,7 +45,7 @@ def main():
     
     with open(input_file, 'r') as f:
         for line in f:
-            n = mpz(line.strip())
+            n = int(line.strip())
             factors = factorize(n)
             print("{}={}".format(n, "*".join(map(str, factors))))
 
