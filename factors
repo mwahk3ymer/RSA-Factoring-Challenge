@@ -1,22 +1,26 @@
-#!/bin/bash
+#!/usr/bin/python3
 
-# Usage function
-usage() {
-	echo "Usage: $0 <file>"
-	echo "  <file>  File containing positive integers (one per line)"
-}
+import sys
 
-# Check if file parameter is provided and exists
-if [ -z "$1" ] || [ ! -f "$1" ]; then
-	usage
-	exit 1
-fi
+def factorize(n):
+    for i in range(2, n):
+        if n % i == 0:
+            return i, n // i
+    return None, None
 
-# Read the file line by line
-filename="$1"
-while IFS= read -r number; do
-	result=$(factor "$number")
-	second_num=$(echo $result | tr ":" "=" | cut -d " " -f 2 | tr -d " ")
-	third_num=$(expr $number / $second_num)
-	echo "$number=$third_num*$second_num"
-done < "$filename"
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: {} <file>".format(sys.argv[0]))
+        sys.exit(1)
+    
+    input_file = sys.argv[1]
+    
+    with open(input_file, 'r') as f:
+        for line in f:
+            n = int(line.strip())
+            p, q = factorize(n)
+            if p is not None and q is not None:
+                print("{}={}*{}".format(n, p, q))
+
+if __name__ == "__main__":
+    main()
